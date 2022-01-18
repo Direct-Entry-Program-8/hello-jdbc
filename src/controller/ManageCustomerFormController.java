@@ -1,14 +1,23 @@
 package controller;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableObjectValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 import util.CustomerTM;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -41,7 +50,19 @@ public class ManageCustomerFormController {
         });
 
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
-//        tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<CustomerTM, ImageView> colPicture = (TableColumn<CustomerTM, ImageView>) tblCustomers.getColumns().get(1);
+
+        colPicture.setCellValueFactory(param -> {
+            byte[] picture = param.getValue().getPicture();
+            ByteArrayInputStream bais = new ByteArrayInputStream(picture);
+
+            ImageView imageView = new ImageView(new Image(bais));
+            imageView.setFitHeight(75);
+            imageView.setFitWidth(75);
+            return new ReadOnlyObjectWrapper<>(imageView);
+        });
+
         tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("firstName"));
         tblCustomers.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("lastName"));
         tblCustomers.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("dob"));
@@ -96,7 +117,7 @@ public class ManageCustomerFormController {
         }
     }
 
-    public void btnSaveCustomer_OnAction(ActionEvent event) {
+    public void btnSaveCustomer_OnAction(ActionEvent event) throws IOException {
         if (!isValidated()){
             return;
         }
@@ -106,7 +127,7 @@ public class ManageCustomerFormController {
                 txtFirstName.getText().trim(),
                 txtLastName.getText().trim(),
                 txtDob.getValue(),
-                null,
+                Files.readAllBytes(Paths.get(txtPicture.getText())),
                 lstTelephone.getItems()
         ));
     }
