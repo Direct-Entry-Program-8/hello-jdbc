@@ -7,6 +7,8 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class ManageCustomerFormController {
 
@@ -87,7 +89,35 @@ public class ManageCustomerFormController {
     }
 
     public void btnSaveCustomer_OnAction(ActionEvent event) {
+        if (!isValidated()){
+            return;
+        }
+    }
 
+    private boolean isValidated(){
+        if (!txtFirstName.getText().matches("[A-Za-z ]+")){
+            new Alert(Alert.AlertType.ERROR, "Invalid first name", ButtonType.OK).show();
+            txtFirstName.requestFocus();
+            return false;
+        }else if (!txtLastName.getText().matches("[A-Za-z ]+")){
+            new Alert(Alert.AlertType.ERROR, "Invalid last name", ButtonType.OK).show();
+            txtLastName.requestFocus();
+            return false;
+        }else if(txtDob.getValue() == null || !LocalDate.now().minus(10, ChronoUnit.YEARS).isAfter(txtDob.getValue())){
+            new Alert(Alert.AlertType.ERROR, "Customer should be at least 10 years old", ButtonType.OK).show();
+            txtDob.requestFocus();
+            return false;
+        }else if (txtPicture.getText().isEmpty()){
+            new Alert(Alert.AlertType.ERROR, "Customer should have a profile picture", ButtonType.OK).show();
+            btnBrowse.requestFocus();
+            return false;
+        }else if (lstTelephone.getItems().isEmpty()){
+            new Alert(Alert.AlertType.ERROR, "Customer should have at least one phone number",ButtonType.OK).show();
+            txtTelephone.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
 }
