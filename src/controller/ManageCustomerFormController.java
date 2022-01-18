@@ -34,10 +34,6 @@ public class ManageCustomerFormController {
         lstTelephone.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             btnRemove.setDisable(newValue == null);
         });
-
-        lstTelephone.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) lstTelephone.getSelectionModel().clearSelection();
-        });
     }
 
     public void btnRemove_OnAction(ActionEvent event) {
@@ -51,6 +47,7 @@ public class ManageCustomerFormController {
     }
 
     public void btnAdd_OnAction(ActionEvent event) {
+        lstTelephone.getSelectionModel().clearSelection();
         for (String telephone : lstTelephone.getItems()) {
             if (telephone.equals(txtTelephone.getText())){
                 txtTelephone.selectAll();
