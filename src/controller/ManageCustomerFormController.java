@@ -24,7 +24,12 @@ public class ManageCustomerFormController {
     public TableView<?> tblCustomers;
 
     public void initialize() throws IOException {
+        btnRemove.setDisable(true);
+        btnAdd.setDisable(true);
 
+        txtTelephone.textProperty().addListener((observable, oldValue, newValue) ->
+                btnAdd.setDisable(!newValue.trim().matches("\\d{3}-\\d{7}"))
+        );
     }
 
     public void btnAdd_OnAction(ActionEvent event) {
