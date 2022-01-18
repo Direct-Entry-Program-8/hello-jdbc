@@ -30,6 +30,20 @@ public class ManageCustomerFormController {
         txtTelephone.textProperty().addListener((observable, oldValue, newValue) ->
                 btnAdd.setDisable(!newValue.trim().matches("\\d{3}-\\d{7}"))
         );
+
+        lstTelephone.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            btnRemove.setDisable(newValue == null);
+        });
+
+        lstTelephone.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) lstTelephone.getSelectionModel().clearSelection();
+        });
+    }
+
+    public void btnRemove_OnAction(ActionEvent event) {
+        String selectedTelephoneNumber = lstTelephone.getSelectionModel().getSelectedItem();
+        lstTelephone.getItems().remove(selectedTelephoneNumber);
+        lstTelephone.getSelectionModel().clearSelection();
     }
 
     public void txtTelephone_OnAction(ActionEvent event) {
@@ -37,6 +51,12 @@ public class ManageCustomerFormController {
     }
 
     public void btnAdd_OnAction(ActionEvent event) {
+        for (String telephone : lstTelephone.getItems()) {
+            if (telephone.equals(txtTelephone.getText())){
+                txtTelephone.selectAll();
+                return;
+            }
+        }
         lstTelephone.getItems().add(txtTelephone.getText());
         txtTelephone.clear();
         txtTelephone.requestFocus();
@@ -56,12 +76,6 @@ public class ManageCustomerFormController {
     public void btnNewCustomer_OnAction(ActionEvent event) {
 
     }
-
-
-    public void btnRemove_OnAction(ActionEvent event) {
-
-    }
-
 
     public void btnSaveCustomer_OnAction(ActionEvent event) {
 
