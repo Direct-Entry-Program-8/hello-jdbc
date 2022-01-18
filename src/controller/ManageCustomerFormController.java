@@ -2,6 +2,10 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ManageCustomerFormController {
 
@@ -19,7 +23,7 @@ public class ManageCustomerFormController {
     public Button btnSaveCustomer;
     public TableView<?> tblCustomers;
 
-    public void initialize(){
+    public void initialize() throws IOException {
 
     }
 
@@ -29,7 +33,12 @@ public class ManageCustomerFormController {
 
 
     public void btnBrowse_OnAction(ActionEvent event) {
-
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter
+                ("Images", "*.jpeg", "*.jpg", "*.gif", "*.png", "*.bmp"));
+        fileChooser.setTitle("Select an image");
+        File file = fileChooser.showOpenDialog(btnBrowse.getScene().getWindow());
+        txtPicture.setText(file != null ? file.getAbsolutePath() : "");
     }
 
 
