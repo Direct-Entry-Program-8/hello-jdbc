@@ -23,32 +23,32 @@ public class ManageCustomerFormController {
 
     }
 
-    void btnAdd_OnAction(ActionEvent event) {
+    public void btnAdd_OnAction(ActionEvent event) {
 
     }
 
 
-    void btnBrowse_OnAction(ActionEvent event) {
+    public void btnBrowse_OnAction(ActionEvent event) {
 
     }
 
 
-    void btnNewCustomer_OnAction(ActionEvent event) {
+    public void btnNewCustomer_OnAction(ActionEvent event) {
 
     }
 
 
-    void btnRemove_OnAction(ActionEvent event) {
+    public void btnRemove_OnAction(ActionEvent event) {
 
     }
 
 
-    void btnSaveCustomer_OnAction(ActionEvent event) {
+    public void btnSaveCustomer_OnAction(ActionEvent event) {
 
     }
 
 
-    void txtTelephone_OnAction(ActionEvent event) {
+    public void txtTelephone_OnAction(ActionEvent event) {
 
     }
 
