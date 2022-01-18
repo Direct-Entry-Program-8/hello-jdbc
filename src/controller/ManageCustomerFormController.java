@@ -3,7 +3,9 @@ package controller;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import util.CustomerTM;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class ManageCustomerFormController {
     public ListView<String> lstTelephone;
     public Button btnRemove;
     public Button btnSaveCustomer;
-    public TableView<?> tblCustomers;
+    public TableView<CustomerTM> tblCustomers;
 
     public void initialize() throws IOException {
         btnRemove.setDisable(true);
@@ -37,6 +39,12 @@ public class ManageCustomerFormController {
         lstTelephone.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             btnRemove.setDisable(newValue == null);
         });
+
+        tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
+//        tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("id"));
+        tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        tblCustomers.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        tblCustomers.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("dob"));
     }
 
     public void btnRemove_OnAction(ActionEvent event) {
@@ -93,7 +101,14 @@ public class ManageCustomerFormController {
             return;
         }
 
-
+        tblCustomers.getItems().add(new CustomerTM(
+                txtId.getText(),
+                txtFirstName.getText().trim(),
+                txtLastName.getText().trim(),
+                txtDob.getValue(),
+                null,
+                lstTelephone.getItems()
+        ));
     }
 
     private boolean isValidated(){
