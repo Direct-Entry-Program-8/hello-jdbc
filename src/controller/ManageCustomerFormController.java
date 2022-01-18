@@ -18,7 +18,7 @@ public class ManageCustomerFormController {
     public Button btnBrowse;
     public TextField txtTelephone;
     public Button btnAdd;
-    public ListView<?> lstTelephone;
+    public ListView<String> lstTelephone;
     public Button btnRemove;
     public Button btnSaveCustomer;
     public TableView<?> tblCustomers;
@@ -32,8 +32,14 @@ public class ManageCustomerFormController {
         );
     }
 
-    public void btnAdd_OnAction(ActionEvent event) {
+    public void txtTelephone_OnAction(ActionEvent event) {
+        btnAdd.fire();
+    }
 
+    public void btnAdd_OnAction(ActionEvent event) {
+        lstTelephone.getItems().add(txtTelephone.getText());
+        txtTelephone.clear();
+        txtTelephone.requestFocus();
     }
 
 
@@ -58,11 +64,6 @@ public class ManageCustomerFormController {
 
 
     public void btnSaveCustomer_OnAction(ActionEvent event) {
-
-    }
-
-
-    public void txtTelephone_OnAction(ActionEvent event) {
 
     }
 
