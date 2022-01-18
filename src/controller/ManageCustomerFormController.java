@@ -92,6 +92,8 @@ public class ManageCustomerFormController {
         if (!isValidated()){
             return;
         }
+
+
     }
 
     private boolean isValidated(){
@@ -103,7 +105,8 @@ public class ManageCustomerFormController {
             new Alert(Alert.AlertType.ERROR, "Invalid last name", ButtonType.OK).show();
             txtLastName.requestFocus();
             return false;
-        }else if(txtDob.getValue() == null || !LocalDate.now().minus(10, ChronoUnit.YEARS).isAfter(txtDob.getValue())){
+        }else if(txtDob.getValue() == null ||
+                !LocalDate.now().minus(10, ChronoUnit.YEARS).isAfter(txtDob.getValue())){
             new Alert(Alert.AlertType.ERROR, "Customer should be at least 10 years old", ButtonType.OK).show();
             txtDob.requestFocus();
             return false;
