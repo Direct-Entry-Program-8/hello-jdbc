@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -71,7 +72,18 @@ public class ManageCustomerFormController {
 
 
     public void btnNewCustomer_OnAction(ActionEvent event) {
+        txtId.setText(generateNewId());
+    }
 
+    private String generateNewId(){
+        if (tblCustomers.getItems().isEmpty()){
+            return "C001";
+        }else{
+            /* Todo: After creating a table model */
+//            ObservableList<?> customers = tblCustomers.getItems();
+//            customers.get(customers.size() - 1).getId();
+            return "C001";
+        }
     }
 
     public void btnSaveCustomer_OnAction(ActionEvent event) {
