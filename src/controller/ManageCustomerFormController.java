@@ -66,6 +66,31 @@ public class ManageCustomerFormController {
         tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("firstName"));
         tblCustomers.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("lastName"));
         tblCustomers.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("dob"));
+
+        disableControls(true);
+    }
+
+    private void disableControls(boolean disable){
+        txtId.setDisable(disable);
+        txtFirstName.setDisable(disable);
+        txtLastName.setDisable(disable);
+        txtDob.setDisable(disable);
+        txtPicture.setDisable(disable);
+        btnBrowse.setDisable(disable);
+        txtTelephone.setDisable(disable);
+        btnSaveCustomer.setDisable(disable);
+        lstTelephone.getSelectionModel().clearSelection();
+        tblCustomers.getSelectionModel().clearSelection();
+
+        if (disable){
+            txtId.clear();
+            txtFirstName.clear();
+            txtLastName.clear();
+            txtDob.setValue(null);
+            txtPicture.clear();
+            txtTelephone.clear();
+            lstTelephone.getItems().clear();
+        }
     }
 
     public void btnRemove_OnAction(ActionEvent event) {
@@ -103,7 +128,9 @@ public class ManageCustomerFormController {
 
 
     public void btnNewCustomer_OnAction(ActionEvent event) {
+        disableControls(false);
         txtId.setText(generateNewId());
+        txtFirstName.requestFocus();
     }
 
     private String generateNewId(){
@@ -129,6 +156,9 @@ public class ManageCustomerFormController {
                 Files.readAllBytes(Paths.get(txtPicture.getText())),
                 lstTelephone.getItems()
         ));
+
+        disableControls(true);
+        btnNewCustomer.requestFocus();
     }
 
     private boolean isValidated(){
