@@ -13,11 +13,13 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import util.CustomerTM;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -143,9 +145,36 @@ public class ManageCustomerFormController {
         }
     }
 
-    public void btnSaveCustomer_OnAction(ActionEvent event) throws IOException {
+    public void btnSaveCustomer_OnAction(ActionEvent event) throws IOException, ClassNotFoundException {
         if (!isValidated()){
             return;
+        }
+
+        byte[] picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try {
+            Connection connection = DriverManager.
+                    getConnection("jdbc:mysql://127.0.0.1:3306/dep8_hello", "root", "mysql");
+
+            String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES " +
+                    "(?1,?2,?3,?4,?5)";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, txtId.getText());
+            stm.setString(2, txtFirstName.getText());
+            stm.setString(3, txtLastName.getText());
+            stm.setDate(4, Date.valueOf(txtDob.getValue()));
+            stm.setBlob(5, new SerialBlob(picture));
+
+            int affectedRows = stm.executeUpdate();
+            connection.close();
+
+            if (affectedRows == 0){
+                new Alert(Alert.AlertType.ERROR, "Failed to save the customer, try again", ButtonType.OK).show();
+                btnSaveCustomer.requestFocus();
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         tblCustomers.getItems().add(new CustomerTM(
@@ -153,7 +182,7 @@ public class ManageCustomerFormController {
                 txtFirstName.getText().trim(),
                 txtLastName.getText().trim(),
                 txtDob.getValue(),
-                Files.readAllBytes(Paths.get(txtPicture.getText())),
+                picture,
                 lstTelephone.getItems()
         ));
 
