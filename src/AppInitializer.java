@@ -14,10 +14,10 @@ public class AppInitializer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/ManageCustomerForm.fxml"));
-        Scene mainScene = new Scene(root);
-        primaryStage.setScene(mainScene);
-        primaryStage.setTitle("Hello JDBC");
+        AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/LoginForm.fxml"));
+        Scene loginScene = new Scene(root);
+        primaryStage.setScene(loginScene);
+        primaryStage.setTitle("Hello JDBC: Login");
         primaryStage.setResizable(false);
         primaryStage.centerOnScreen();
         primaryStage.show();
