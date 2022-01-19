@@ -110,10 +110,9 @@ public class ManageCustomerFormController {
         if (tblCustomers.getItems().isEmpty()){
             return "C001";
         }else{
-            /* Todo: After creating a table model */
-//            ObservableList<?> customers = tblCustomers.getItems();
-//            customers.get(customers.size() - 1).getId();
-            return "C001";
+            ObservableList<CustomerTM> customers = tblCustomers.getItems();
+            int lastCustomerId = Integer.parseInt(customers.get(customers.size() - 1).getId().replace("C", ""));
+            return String.format("C%03d", (lastCustomerId + 1));
         }
     }
 
