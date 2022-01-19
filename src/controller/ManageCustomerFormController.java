@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 public class ManageCustomerFormController {
 
@@ -39,7 +40,7 @@ public class ManageCustomerFormController {
     public Button btnSaveCustomer;
     public TableView<CustomerTM> tblCustomers;
 
-    public void initialize() throws IOException {
+    public void initialize() throws IOException, ClassNotFoundException {
         btnRemove.setDisable(true);
         btnAdd.setDisable(true);
 
@@ -70,6 +71,42 @@ public class ManageCustomerFormController {
         tblCustomers.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("dob"));
 
         disableControls(true);
+
+        loadAllCustomers();
+    }
+
+    private void loadAllCustomers() throws ClassNotFoundException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dep8_hello", "root", "mysql");
+
+            String sql = "SELECT * FROM customer";
+            Statement stm = connection.createStatement();
+            ResultSet rst = stm.executeQuery(sql);
+
+            ObservableList<CustomerTM> customers = tblCustomers.getItems();
+            customers.clear();
+            while (rst.next()){
+
+                Blob blobPic = rst.getBlob("picture");
+                byte[] picture = blobPic.getBytes(1, (int) blobPic.length());
+
+                customers.add(new CustomerTM(
+                        rst.getString("id"),
+                        rst.getString("first_name"),
+                        rst.getString("last_name"),
+                        rst.getDate("dob").toLocalDate(),
+                        picture,
+                        new ArrayList<>()
+                ));
+            }
+
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Failed to load customers", ButtonType.OK).showAndWait();
+            System.exit(0);
+        }
     }
 
     private void disableControls(boolean disable){
