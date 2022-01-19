@@ -151,13 +151,13 @@ public class ManageCustomerFormController {
         }
 
         byte[] picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
+
         Class.forName("com.mysql.cj.jdbc.Driver");
         try {
             Connection connection = DriverManager.
                     getConnection("jdbc:mysql://127.0.0.1:3306/dep8_hello", "root", "mysql");
 
-            String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES " +
-                    "(?1,?2,?3,?4,?5)";
+            String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES (?,?,?,?,?)";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, txtId.getText());
             stm.setString(2, txtFirstName.getText());
@@ -175,6 +175,9 @@ public class ManageCustomerFormController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Failed to save the customer, contact DEPPO", ButtonType.OK).show();
+            btnSaveCustomer.requestFocus();
+            return;
         }
 
         tblCustomers.getItems().add(new CustomerTM(
