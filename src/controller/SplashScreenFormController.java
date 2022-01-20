@@ -16,11 +16,39 @@ public class SplashScreenFormController {
     public ProgressBar pgb;
 
     private SimpleDoubleProperty progress = new SimpleDoubleProperty(0.0);
-    private SimpleStringProperty statusText = new SimpleStringProperty("Loading...");
+    private SimpleStringProperty statusText = new SimpleStringProperty("Initializing...");
 
     public void initialize(){
         lblStatus.textProperty().bind(statusText);
         pgb.progressProperty().bind(progress);
+
+        new Thread(()->{
+
+            establishDBConnection();
+
+        }).start();
+    }
+
+    private void establishDBConnection(){
+        try {
+            updateProgress("Establishing DB Connection", 0.2);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.
+                    getConnection("jdbc:mysql://localhost:3306/dep8_hello?allowMultiQueries=true", "root", "mysql");
+
+            updateProgress("Found an existing DB", 0.5);
+            Thread.sleep(100);
+
+            updateProgress("Setting up the connection", 0.8);
+            Thread.sleep(100);
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally{
+            updateProgress("Done", 1.0);
+        }
     }
 
     private void updateProgress(String status, double value){
