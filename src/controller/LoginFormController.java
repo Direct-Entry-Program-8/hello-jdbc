@@ -27,26 +27,27 @@ public class LoginFormController {
             return;
         }
 
-        String username = txtUserName.getText();
-        String password = txtPassword.getText();
-
         Class.forName("com.mysql.cj.jdbc.Driver");
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dep8_hello", "root", "mysql");
+            Connection connection = DriverManager.
+                    getConnection("jdbc:mysql://localhost:3306/dep8_hello", "root", "mysql");
 
-            String sql = String.format("SELECT * FROM user WHERE username='%s' AND password='%s'", username, password);
-            Statement stm = connection.createStatement();
-            ResultSet rst = stm.executeQuery(sql);
+            PreparedStatement stm = connection.
+                    prepareStatement("SELECT * FROM user WHERE username=? AND password=?");
+            stm.setString(1, txtUserName.getText());
+            stm.setString(2, txtPassword.getText());
+            ResultSet rst = stm.executeQuery();
 
-            if (rst.next()){
-                AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/ManageCustomerForm.fxml"));
+            if (rst.next()) {
+                AnchorPane root = FXMLLoader.
+                        load(this.getClass().getResource("/view/ManageCusgtomerForm.fxml"));
                 Scene mainScene = new Scene(root);
-                Stage primaryStage = (Stage)btnLogin.getScene().getWindow();
+                Stage primaryStage = (Stage) btnLogin.getScene().getWindow();
                 primaryStage.setScene(mainScene);
                 primaryStage.setTitle("Hello JDBC: Home");
                 primaryStage.sizeToScene();
                 primaryStage.centerOnScreen();
-            }else{
+            } else {
                 new Alert(Alert.AlertType.ERROR, "Invalid username and password, please try again").show();
                 txtUserName.requestFocus();
             }
@@ -57,9 +58,9 @@ public class LoginFormController {
         }
     }
 
-    private boolean isValidated(){
+    private boolean isValidated() {
         return (txtUserName.getText().trim().length() >= 2 &&
-            txtPassword.getText().trim().length() >= 2);
+                txtPassword.getText().trim().length() >= 2);
     }
 
 }
