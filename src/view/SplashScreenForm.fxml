@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="446.0" prefWidth="475.0" style="-fx-background-color: TRANSPARENT;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SplashScreenFormController">
+   <children>
+      <ImageView fitHeight="446.0" fitWidth="446.0" layoutX="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@assets/splash.gif" />
+         </image>
+      </ImageView>
+      <AnchorPane layoutX="94.0" layoutY="131.0" opacity="0.84" prefHeight="126.0" prefWidth="287.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+         <children>
+            <Label layoutX="51.0" layoutY="14.0" text="Hello JDBC">
+               <font>
+                  <Font size="35.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblStatus" alignment="CENTER" layoutY="63.0" prefHeight="16.0" prefWidth="287.0" text="Loading.." />
+            <ProgressBar fx:id="pgb" layoutX="42.0" layoutY="94.0" prefWidth="200.0" progress="0.28" style="-fx-accent: purple;" />
+         </children>
+         <effect>
+            <DropShadow />
+         </effect>
+      </AnchorPane>
+   </children>
+</AnchorPane>

@@ -40,7 +40,7 @@ public class LoginFormController {
 
             if (rst.next()) {
                 AnchorPane root = FXMLLoader.
-                        load(this.getClass().getResource("/view/ManageCusgtomerForm.fxml"));
+                        load(this.getClass().getResource("/view/ManageCustomerForm.fxml"));
                 Scene mainScene = new Scene(root);
                 Stage primaryStage = (Stage) btnLogin.getScene().getWindow();
                 primaryStage.setScene(mainScene);

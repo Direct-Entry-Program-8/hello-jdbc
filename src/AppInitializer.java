@@ -2,7 +2,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -14,12 +17,12 @@ public class AppInitializer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/LoginForm.fxml"));
+        AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/SplashScreenForm.fxml"));
         Scene loginScene = new Scene(root);
         primaryStage.setScene(loginScene);
-        primaryStage.setTitle("Hello JDBC: Login");
-        primaryStage.setResizable(false);
-        primaryStage.centerOnScreen();
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        loginScene.setFill(Color.TRANSPARENT);
         primaryStage.show();
+        primaryStage.centerOnScreen();
     }
 }
