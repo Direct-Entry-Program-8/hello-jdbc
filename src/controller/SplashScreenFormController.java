@@ -34,23 +34,24 @@ public class SplashScreenFormController {
             updateProgress("Establishing DB Connection", 0.2);
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.
-                    getConnection("jdbc:mysql://localhost:3306/dep8_hello11?allowMultiQueries=true", "root", "mysql");
+                    getConnection("jdbc:mysql://localhost:3306/dep8_hello?allowMultiQueries=true", "root", "mysql");
 
             updateProgress("Found an existing DB", 0.5);
-            Thread.sleep(100);
+            sleep(100);
 
             updateProgress("Setting up the connection", 0.8);
-            Thread.sleep(100);
+            sleep(100);
         } catch (SQLException e) {
             if (e.getSQLState().equals("42000")) {
                 createDB();
             } else {
                 updateProgress("Network failure", 0.8);
+                sleep(100);
             }
-        } catch (InterruptedException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
-            updateProgress("Done", 1.0);
+            //updateProgress("Done", 1.0);
         }
     }
 
@@ -63,12 +64,23 @@ public class SplashScreenFormController {
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
             String dbScript = new String(buffer);
+            sleep(100);
 
             updateProgress("Executing DB Script", 0.8);
             Statement stm = connection.createStatement();
             stm.execute(dbScript);
+            sleep(100);
 
         } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sleep(long millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            /* Todo: Handle exception */
             e.printStackTrace();
         }
     }
