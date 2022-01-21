@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import util.DBConnection;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -31,6 +32,7 @@ public class SplashScreenFormController {
                 Connection connection = establishDBConnection();
                 updateProgress("Stating the app", 1.0);
                 Thread.sleep(100);
+                DBConnection.getInstance().init(connection);
 
                 AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/LoginForm.fxml"));
                 Platform.runLater(() -> {

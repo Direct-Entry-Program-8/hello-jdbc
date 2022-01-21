@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import util.CustomerTM;
+import util.DBConnection;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
@@ -76,9 +77,8 @@ public class ManageCustomerFormController {
     }
 
     private void loadAllCustomers() throws ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dep8_hello", "root", "mysql");
+            Connection connection = DBConnection.getInstance().getConnection();
 
             String sql = "SELECT * FROM customer";
             Statement stm = connection.createStatement();
@@ -100,8 +100,6 @@ public class ManageCustomerFormController {
                         new ArrayList<>()
                 ));
             }
-
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to load customers", ButtonType.OK).showAndWait();
@@ -189,10 +187,8 @@ public class ManageCustomerFormController {
 
         byte[] picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
 
-        Class.forName("com.mysql.cj.jdbc.Driver");
         try {
-            Connection connection = DriverManager.
-                    getConnection("jdbc:mysql://127.0.0.1:3306/dep8_hello", "root", "mysql");
+            Connection connection = DBConnection.getInstance().getConnection();
 
             String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES (?,?,?,?,?)";
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -203,7 +199,6 @@ public class ManageCustomerFormController {
             stm.setBlob(5, new SerialBlob(picture));
 
             int affectedRows = stm.executeUpdate();
-            connection.close();
 
             if (affectedRows == 0){
                 new Alert(Alert.AlertType.ERROR, "Failed to save the customer, try again", ButtonType.OK).show();

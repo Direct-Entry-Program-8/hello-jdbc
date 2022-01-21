@@ -9,6 +9,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import util.DBConnection;
 
 import java.io.IOException;
 import java.sql.*;
@@ -27,11 +28,8 @@ public class LoginFormController {
             return;
         }
 
-        Class.forName("com.mysql.cj.jdbc.Driver");
         try {
-            Connection connection = DriverManager.
-                    getConnection("jdbc:mysql://localhost:3306/dep8_hello", "root", "mysql");
-
+            Connection connection = DBConnection.getInstance().getConnection();
             PreparedStatement stm = connection.
                     prepareStatement("SELECT * FROM user WHERE username=? AND password=?");
             stm.setString(1, txtUserName.getText());
@@ -52,7 +50,6 @@ public class LoginFormController {
                 txtUserName.requestFocus();
             }
 
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
