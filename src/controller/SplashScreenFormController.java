@@ -30,7 +30,7 @@ public class SplashScreenFormController {
             try {
                 Connection connection = establishDBConnection();
                 updateProgress("Stating the app", 1.0);
-                Thread.sleep(1000);
+                Thread.sleep(100);
 
                 AnchorPane root = FXMLLoader.load(this.getClass().getResource("/view/LoginForm.fxml"));
                 Platform.runLater(() -> {
@@ -48,10 +48,10 @@ public class SplashScreenFormController {
                 e.printStackTrace();
                 try {
                     updateProgress("Failed to initialize", 0.8);
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
 
                     updateProgress("Shutting down the app", 1.0);
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                     System.exit(0);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
@@ -68,10 +68,10 @@ public class SplashScreenFormController {
                     getConnection("jdbc:mysql://localhost:3306/dep8_hello", "root", "mysql");
 
             updateProgress("Found an existing DB", 0.5);
-            Thread.sleep(1000);
+            Thread.sleep(100);
 
             updateProgress("Setting up the connection", 0.8);
-            Thread.sleep(1000);
+            Thread.sleep(100);
 
             return connection;
         } catch (SQLException e) {
@@ -81,7 +81,7 @@ public class SplashScreenFormController {
                         getConnection("jdbc:mysql://localhost:3306/dep8_hello", "root", "mysql");
             } else {
                 updateProgress("Network failure", 0.8);
-                Thread.sleep(1000);
+                Thread.sleep(100);
                 throw new RuntimeException("Network failure");
             }
         }
@@ -96,12 +96,12 @@ public class SplashScreenFormController {
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
             String dbScript = new String(buffer);
-            Thread.sleep(1000);
+            Thread.sleep(100);
 
             updateProgress("Executing DB Script", 0.8);
             Statement stm = connection.createStatement();
             stm.execute(dbScript);
-            Thread.sleep(1000);
+            Thread.sleep(100);
         }
     }
 
