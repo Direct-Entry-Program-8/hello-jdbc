@@ -15,7 +15,7 @@
             <Image url="@assets/splash.gif" />
          </image>
       </ImageView>
-      <AnchorPane layoutX="94.0" layoutY="131.0" opacity="0.84" prefHeight="126.0" prefWidth="287.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+      <AnchorPane layoutX="94.0" layoutY="131.0" opacity="0.94" prefHeight="126.0" prefWidth="287.0" style="-fx-background-color: rgba(255,255,255,0.7); -fx-background-radius: 10px;">
          <children>
             <Label layoutX="51.0" layoutY="14.0" text="Hello JDBC">
                <font>
