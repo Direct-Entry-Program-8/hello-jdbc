@@ -1,35 +1,35 @@
 package controller;
 
-import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 
-import java.net.ConnectException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SplashScreenFormController {
     public Label lblStatus;
     public ProgressBar pgb;
 
-    private SimpleDoubleProperty progress = new SimpleDoubleProperty(0.0);
-    private SimpleStringProperty statusText = new SimpleStringProperty("Initializing...");
+    private final SimpleDoubleProperty progress = new SimpleDoubleProperty(0.0);
+    private final SimpleStringProperty statusText = new SimpleStringProperty("Initializing...");
 
-    public void initialize(){
+    public void initialize() {
         lblStatus.textProperty().bind(statusText);
         pgb.progressProperty().bind(progress);
 
-        new Thread(()->{
+        new Thread(() -> {
             establishDBConnection();
         }).start();
     }
 
-    private void establishDBConnection(){
+    private void establishDBConnection() {
         try {
             updateProgress("Establishing DB Connection", 0.2);
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -41,28 +41,43 @@ public class SplashScreenFormController {
 
             updateProgress("Setting up the connection", 0.8);
             Thread.sleep(100);
-        } catch (SQLException  e) {
-            if (e.getSQLState().equals("42000")){
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("42000")) {
                 createDB();
-            }else{
+            } else {
                 updateProgress("Network failure", 0.8);
             }
         } catch (InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             updateProgress("Done", 1.0);
         }
     }
 
-    private void createDB(){
+    private void createDB() {
 
+        updateProgress("Loading DB Script", 0.6);
+        try (InputStream is = this.getClass().getResourceAsStream("/assets/dbscript.sql");
+             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?allowMultiQueries=true", "root", "mysql")) {
+
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+            String dbScript = new String(buffer);
+
+            updateProgress("Executing DB Script", 0.8);
+            Statement stm = connection.createStatement();
+            stm.execute(dbScript);
+
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void updateProgress(String status, double value){
-        Platform.runLater(()->{
+    private void updateProgress(String status, double value) {
+        Platform.runLater(() -> {
             statusText.set(status);
             progress.set(value);
         });
     }
-    
+
 }
