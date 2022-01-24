@@ -1,6 +1,7 @@
 package util;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,7 +12,7 @@ public class CustomerTM {
     private String lastName;
     private LocalDate dob;
     private byte[] picture;
-    private List<String> telephone;
+    private ObservableList<String> telephone;
 
     public CustomerTM() {
     }
@@ -65,7 +66,7 @@ public class CustomerTM {
         this.picture = picture;
     }
 
-    public List<String> getTelephone() {
+    public ObservableList<String> getTelephone() {
         return telephone;
     }
 

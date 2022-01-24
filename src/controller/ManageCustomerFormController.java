@@ -1,8 +1,10 @@
 package controller;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -75,6 +77,23 @@ public class ManageCustomerFormController {
         disableControls(true);
 
         loadAllCustomers();
+
+        tblCustomers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedCustomer) -> {
+            if (selectedCustomer == null) return;
+
+            disableControls(false);
+
+            txtId.setText(selectedCustomer.getId());
+            txtFirstName.setText(selectedCustomer.getFirstName());
+            txtLastName.setText(selectedCustomer.getLastName());
+            txtDob.setValue(selectedCustomer.getDob());
+
+            if (selectedCustomer.getPicture() != null){
+                txtPicture.setText("[PICTURE]");
+            }
+
+            lstTelephone.setItems(selectedCustomer.getTelephone());
+        });
     }
 
     private void loadAllCustomers() throws ClassNotFoundException {
@@ -118,6 +137,14 @@ public class ManageCustomerFormController {
     }
 
     private void disableControls(boolean disable){
+        txtId.clear();
+        txtFirstName.clear();
+        txtLastName.clear();
+        txtDob.setValue(null);
+        txtPicture.clear();
+        txtTelephone.clear();
+        lstTelephone.setItems(FXCollections.observableArrayList());
+
         txtId.setDisable(disable);
         txtFirstName.setDisable(disable);
         txtLastName.setDisable(disable);
@@ -126,10 +153,10 @@ public class ManageCustomerFormController {
         btnBrowse.setDisable(disable);
         txtTelephone.setDisable(disable);
         btnSaveCustomer.setDisable(disable);
-        lstTelephone.getSelectionModel().clearSelection();
-        tblCustomers.getSelectionModel().clearSelection();
 
         if (disable){
+            lstTelephone.getSelectionModel().clearSelection();
+            tblCustomers.getSelectionModel().clearSelection();
             txtId.clear();
             txtFirstName.clear();
             txtLastName.clear();
