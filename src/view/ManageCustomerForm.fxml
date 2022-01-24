@@ -72,6 +72,6 @@
             <TableColumn prefWidth="114.0" text="Date of Birth" />
         </columns>
       </TableView>
-      <Button fx:id="btnDeleteCustomer" layoutX="287.0" layoutY="372.0" mnemonicParsing="false" onAction="#btnDeleteCustomer_OnAction" text="Delete Customer" />
+      <Button fx:id="btnDeleteCustomer" layoutX="306.0" layoutY="372.0" mnemonicParsing="false" onAction="#btnDeleteCustomer_OnAction" text="Delete Customer" />
    </children>
 </AnchorPane>

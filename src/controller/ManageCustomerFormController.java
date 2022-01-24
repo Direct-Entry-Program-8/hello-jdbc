@@ -79,6 +79,7 @@ public class ManageCustomerFormController {
 
         tblCustomers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedCustomer) -> {
             btnDeleteCustomer.setDisable(selectedCustomer == null);
+            btnSaveCustomer.setText(selectedCustomer == null ? "Save Customer" : "Update Customer");
             if (selectedCustomer == null) return;
 
             disableControls(false);
@@ -223,33 +224,76 @@ public class ManageCustomerFormController {
             return;
         }
 
-        byte[] picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
+        byte[] picture;
+        if (!txtPicture.getText().equals("[PICTURE]")){
+            picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
+        }else{
+            picture = tblCustomers.getSelectionModel().getSelectedItem().getPicture();
+        }
         Connection connection = DBConnection.getInstance().getConnection();
 
         try {
             connection.setAutoCommit(false);
 
-            String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES (?,?,?,?,?)";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, txtId.getText());
-            stm.setString(2, txtFirstName.getText());
-            stm.setString(3, txtLastName.getText());
-            stm.setDate(4, Date.valueOf(txtDob.getValue()));
-            stm.setBlob(5, new SerialBlob(picture));
-            stm.executeUpdate();
+            if (btnSaveCustomer.getText().equals("Save Customer")) {
 
-            PreparedStatement stmContact = connection.
-                    prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
-            for (String telephone : lstTelephone.getItems()) {
-                stmContact.setString(1, txtId.getText());
-                stmContact.setString(2, telephone);
-                stmContact.addBatch();
-            }
-            if (!lstTelephone.getItems().isEmpty()) {
-                stmContact.executeBatch();
+                String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES (?,?,?,?,?)";
+                PreparedStatement stm = connection.prepareStatement(sql);
+                stm.setString(1, txtId.getText());
+                stm.setString(2, txtFirstName.getText());
+                stm.setString(3, txtLastName.getText());
+                stm.setDate(4, Date.valueOf(txtDob.getValue()));
+                stm.setBlob(5, new SerialBlob(picture));
+                stm.executeUpdate();
+
+                PreparedStatement stmContact = connection.
+                        prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
+                for (String telephone : lstTelephone.getItems()) {
+                    stmContact.setString(1, txtId.getText());
+                    stmContact.setString(2, telephone);
+                    stmContact.addBatch();
+                }
+                if (!lstTelephone.getItems().isEmpty()) {
+                    stmContact.executeBatch();
+                }
+
+            }else{
+
+                PreparedStatement stmDelContacts = connection.prepareStatement("DELETE FROM contact WHERE customer_id=?");
+                stmDelContacts.setString(1, txtId.getText());
+                if (stmDelContacts.executeUpdate() == 0){
+                    throw new RuntimeException("Failed to delete the old contacts");
+                }
+
+                PreparedStatement stmAddContacts = connection.prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
+                for (String telephone : lstTelephone.getItems()) {
+                    stmAddContacts.setString(1, txtId.getText());
+                    stmAddContacts.setString(2, telephone);
+                    stmAddContacts.addBatch();
+                }
+                stmAddContacts.executeBatch();
+
+                String sql =  "UPDATE customer SET first_name=?, last_name=?, dob=?, picture=? WHERE id=?";
+                if (txtPicture.getText().equals("[PICTURE]")){
+                    sql =  "UPDATE customer SET first_name=?, last_name=?, dob=? WHERE id=?";
+                }
+                PreparedStatement stmCustomer = connection.prepareStatement(sql);
+                stmCustomer.setString(1, txtFirstName.getText());
+                stmCustomer.setString(2, txtLastName.getText());
+                stmCustomer.setDate(3, Date.valueOf(txtDob.getValue()));
+                if (!txtPicture.getText().equals("[PICTURE]")){
+                    stmCustomer.setBlob(4, new SerialBlob(picture));
+                    stmCustomer.setString(5, txtId.getText());
+                }else{
+                    stmCustomer.setString(4, txtId.getText());
+                }
+                if (stmCustomer.executeUpdate() != 1){
+                    throw new RuntimeException("Failed to update the customer details");
+                }
             }
 
             connection.commit();
+
         } catch (Throwable e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to save the customer, contact DEPPO", ButtonType.OK).show();
@@ -260,14 +304,24 @@ public class ManageCustomerFormController {
             handleSQLException(() -> connection.setAutoCommit(true));
         }
 
-        tblCustomers.getItems().add(new CustomerTM(
-                txtId.getText(),
-                txtFirstName.getText().trim(),
-                txtLastName.getText().trim(),
-                txtDob.getValue(),
-                picture,
-                lstTelephone.getItems()
-        ));
+        if (btnSaveCustomer.getText().equals("Save Customer")){
+            tblCustomers.getItems().add(new CustomerTM(
+                    txtId.getText(),
+                    txtFirstName.getText().trim(),
+                    txtLastName.getText().trim(),
+                    txtDob.getValue(),
+                    picture,
+                    lstTelephone.getItems()
+            ));
+        }else{
+            CustomerTM selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
+            selectedCustomer.setFirstName(txtFirstName.getText());
+            selectedCustomer.setLastName(txtLastName.getText());
+            selectedCustomer.setDob(txtDob.getValue());
+            selectedCustomer.setPicture(picture);
+            selectedCustomer.setTelephone(lstTelephone.getItems());
+            tblCustomers.refresh();
+        }
 
         disableControls(true);
         btnNewCustomer.requestFocus();
