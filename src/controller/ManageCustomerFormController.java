@@ -24,6 +24,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ManageCustomerFormController {
 
@@ -83,6 +84,7 @@ public class ManageCustomerFormController {
             String sql = "SELECT * FROM customer";
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery(sql);
+            PreparedStatement stmContact = connection.prepareStatement("SELECT telephone FROM contact WHERE customer_id=?");
 
             ObservableList<CustomerTM> customers = tblCustomers.getItems();
             customers.clear();
@@ -91,13 +93,21 @@ public class ManageCustomerFormController {
                 Blob blobPic = rst.getBlob("picture");
                 byte[] picture = blobPic.getBytes(1, (int) blobPic.length());
 
+                stmContact.setString(1, rst.getString("id"));
+                ResultSet rstContacts = stmContact.executeQuery();
+                List<String> telephoneNumbers = new ArrayList<>();
+
+                while (rstContacts.next()){
+                    telephoneNumbers.add(rstContacts.getString("telephone"));
+                }
+
                 customers.add(new CustomerTM(
                         rst.getString("id"),
                         rst.getString("first_name"),
                         rst.getString("last_name"),
                         rst.getDate("dob").toLocalDate(),
                         picture,
-                        new ArrayList<>()
+                        telephoneNumbers
                 ));
             }
         } catch (SQLException e) {
@@ -206,7 +216,8 @@ public class ManageCustomerFormController {
                 return;
             }
 
-            PreparedStatement stmContact = connection.prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
+            PreparedStatement stmContact = connection.
+                    prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
             for (String telephone : lstTelephone.getItems()) {
                 stmContact.setString(1, txtId.getText());
                 stmContact.setString(2, telephone);
