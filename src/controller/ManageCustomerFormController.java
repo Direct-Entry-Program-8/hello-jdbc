@@ -15,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import util.CustomerTM;
 import util.DBConnection;
+import util.SQLBlock;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
@@ -252,19 +253,11 @@ public class ManageCustomerFormController {
         } catch (Throwable e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to save the customer, contact DEPPO", ButtonType.OK).show();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            handleSQLException(connection::rollback);
             btnSaveCustomer.requestFocus();
             return;
         }finally{
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            handleSQLException(() -> connection.setAutoCommit(true));
         }
 
         tblCustomers.getItems().add(new CustomerTM(
@@ -305,6 +298,14 @@ public class ManageCustomerFormController {
         }
 
         return true;
+    }
+
+    private void handleSQLException(SQLBlock block){
+        try {
+            block.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }
