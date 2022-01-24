@@ -1,9 +1,6 @@
 package controller;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableObjectValue;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,7 +9,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import util.CustomerTM;
 import util.DBConnection;
 import util.SQLBlock;
@@ -44,10 +40,12 @@ public class ManageCustomerFormController {
     public Button btnRemove;
     public Button btnSaveCustomer;
     public TableView<CustomerTM> tblCustomers;
+    public Button btnDeleteCustomer;
 
     public void initialize() throws IOException, ClassNotFoundException {
         btnRemove.setDisable(true);
         btnAdd.setDisable(true);
+        btnDeleteCustomer.setDisable(true);
 
         txtTelephone.textProperty().addListener((observable, oldValue, newValue) ->
                 btnAdd.setDisable(!newValue.trim().matches("\\d{3}-\\d{7}"))
@@ -80,6 +78,7 @@ public class ManageCustomerFormController {
         loadAllCustomers();
 
         tblCustomers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedCustomer) -> {
+            btnDeleteCustomer.setDisable(selectedCustomer == null);
             if (selectedCustomer == null) return;
 
             disableControls(false);
@@ -89,7 +88,7 @@ public class ManageCustomerFormController {
             txtLastName.setText(selectedCustomer.getLastName());
             txtDob.setValue(selectedCustomer.getDob());
 
-            if (selectedCustomer.getPicture() != null){
+            if (selectedCustomer.getPicture() != null) {
                 txtPicture.setText("[PICTURE]");
             }
 
@@ -108,7 +107,7 @@ public class ManageCustomerFormController {
 
             ObservableList<CustomerTM> customers = tblCustomers.getItems();
             customers.clear();
-            while (rst.next()){
+            while (rst.next()) {
 
                 Blob blobPic = rst.getBlob("picture");
                 byte[] picture = blobPic.getBytes(1, (int) blobPic.length());
@@ -117,7 +116,7 @@ public class ManageCustomerFormController {
                 ResultSet rstContacts = stmContact.executeQuery();
                 List<String> telephoneNumbers = new ArrayList<>();
 
-                while (rstContacts.next()){
+                while (rstContacts.next()) {
                     telephoneNumbers.add(rstContacts.getString("telephone"));
                 }
 
@@ -137,7 +136,7 @@ public class ManageCustomerFormController {
         }
     }
 
-    private void disableControls(boolean disable){
+    private void disableControls(boolean disable) {
         txtId.clear();
         txtFirstName.clear();
         txtLastName.clear();
@@ -155,7 +154,7 @@ public class ManageCustomerFormController {
         txtTelephone.setDisable(disable);
         btnSaveCustomer.setDisable(disable);
 
-        if (disable){
+        if (disable) {
             lstTelephone.getSelectionModel().clearSelection();
             tblCustomers.getSelectionModel().clearSelection();
             txtId.clear();
@@ -181,7 +180,7 @@ public class ManageCustomerFormController {
     public void btnAdd_OnAction(ActionEvent event) {
         lstTelephone.getSelectionModel().clearSelection();
         for (String telephone : lstTelephone.getItems()) {
-            if (telephone.equals(txtTelephone.getText())){
+            if (telephone.equals(txtTelephone.getText())) {
                 txtTelephone.selectAll();
                 return;
             }
@@ -206,12 +205,13 @@ public class ManageCustomerFormController {
         disableControls(false);
         txtId.setText(generateNewId());
         txtFirstName.requestFocus();
+        tblCustomers.getSelectionModel().clearSelection();
     }
 
-    private String generateNewId(){
-        if (tblCustomers.getItems().isEmpty()){
+    private String generateNewId() {
+        if (tblCustomers.getItems().isEmpty()) {
             return "C001";
-        }else{
+        } else {
             ObservableList<CustomerTM> customers = tblCustomers.getItems();
             int lastCustomerId = Integer.parseInt(customers.get(customers.size() - 1).getId().replace("C", ""));
             return String.format("C%03d", (lastCustomerId + 1));
@@ -219,7 +219,7 @@ public class ManageCustomerFormController {
     }
 
     public void btnSaveCustomer_OnAction(ActionEvent event) throws IOException, ClassNotFoundException {
-        if (!isValidated()){
+        if (!isValidated()) {
             return;
         }
 
@@ -245,7 +245,7 @@ public class ManageCustomerFormController {
                 stmContact.setString(2, telephone);
                 stmContact.addBatch();
             }
-            if (!lstTelephone.getItems().isEmpty()){
+            if (!lstTelephone.getItems().isEmpty()) {
                 stmContact.executeBatch();
             }
 
@@ -256,7 +256,7 @@ public class ManageCustomerFormController {
             handleSQLException(connection::rollback);
             btnSaveCustomer.requestFocus();
             return;
-        }finally{
+        } finally {
             handleSQLException(() -> connection.setAutoCommit(true));
         }
 
@@ -273,26 +273,26 @@ public class ManageCustomerFormController {
         btnNewCustomer.requestFocus();
     }
 
-    private boolean isValidated(){
-        if (!txtFirstName.getText().matches("[A-Za-z ]+")){
+    private boolean isValidated() {
+        if (!txtFirstName.getText().matches("[A-Za-z ]+")) {
             new Alert(Alert.AlertType.ERROR, "Invalid first name", ButtonType.OK).show();
             txtFirstName.requestFocus();
             return false;
-        }else if (!txtLastName.getText().matches("[A-Za-z ]+")){
+        } else if (!txtLastName.getText().matches("[A-Za-z ]+")) {
             new Alert(Alert.AlertType.ERROR, "Invalid last name", ButtonType.OK).show();
             txtLastName.requestFocus();
             return false;
-        }else if(txtDob.getValue() == null ||
-                !LocalDate.now().minus(10, ChronoUnit.YEARS).isAfter(txtDob.getValue())){
+        } else if (txtDob.getValue() == null ||
+                !LocalDate.now().minus(10, ChronoUnit.YEARS).isAfter(txtDob.getValue())) {
             new Alert(Alert.AlertType.ERROR, "Customer should be at least 10 years old", ButtonType.OK).show();
             txtDob.requestFocus();
             return false;
-        }else if (txtPicture.getText().isEmpty()){
+        } else if (txtPicture.getText().isEmpty()) {
             new Alert(Alert.AlertType.ERROR, "Customer should have a profile picture", ButtonType.OK).show();
             btnBrowse.requestFocus();
             return false;
-        }else if (lstTelephone.getItems().isEmpty()){
-            new Alert(Alert.AlertType.ERROR, "Customer should have at least one phone number",ButtonType.OK).show();
+        } else if (lstTelephone.getItems().isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "Customer should have at least one phone number", ButtonType.OK).show();
             txtTelephone.requestFocus();
             return false;
         }
@@ -300,7 +300,7 @@ public class ManageCustomerFormController {
         return true;
     }
 
-    private void handleSQLException(SQLBlock block){
+    private void handleSQLException(SQLBlock block) {
         try {
             block.execute();
         } catch (SQLException e) {
@@ -308,4 +308,36 @@ public class ManageCustomerFormController {
         }
     }
 
+    public void btnDeleteCustomer_OnAction(ActionEvent actionEvent) {
+        Connection connection = DBConnection.getInstance().getConnection();
+        String customerId = tblCustomers.getSelectionModel().getSelectedItem().getId();
+        try {
+            connection.setAutoCommit(false);
+
+            PreparedStatement stmContacts = connection.
+                    prepareStatement("DELETE FROM contact WHERE customer_id=?");
+            stmContacts.setString(1, customerId);
+            if (stmContacts.executeUpdate() == 0) {
+                throw new RuntimeException("Failed to delete contacts");
+            }
+
+            PreparedStatement stmCustomer = connection.
+                    prepareStatement("DELETE FROM customer WHERE id=?");
+            stmCustomer.setString(1, customerId);
+            if (stmCustomer.executeUpdate() != 1) {
+                throw new RuntimeException("Failed to delete the customer");
+            }
+
+            connection.commit();
+            tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
+            disableControls(true);
+            btnNewCustomer.requestFocus();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            handleSQLException(connection::rollback);
+            new Alert(Alert.AlertType.ERROR, "Failed to delete the customer " + customerId + ", try again").show();
+        } finally {
+            handleSQLException(() -> connection.setAutoCommit(true));
+        }
+    }
 }

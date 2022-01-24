@@ -13,7 +13,6 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="623.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManageCustomerFormController">
    <children>
       <Label layoutX="17.0" layoutY="22.0" text="Manage Customers">
@@ -73,5 +72,6 @@
             <TableColumn prefWidth="114.0" text="Date of Birth" />
         </columns>
       </TableView>
+      <Button fx:id="btnDeleteCustomer" layoutX="287.0" layoutY="372.0" mnemonicParsing="false" onAction="#btnDeleteCustomer_OnAction" text="Delete Customer" />
    </children>
 </AnchorPane>
