@@ -223,9 +223,10 @@ public class ManageCustomerFormController {
         }
 
         byte[] picture = Files.readAllBytes(Paths.get(txtPicture.getText()));
+        Connection connection = DBConnection.getInstance().getConnection();
 
         try {
-            Connection connection = DBConnection.getInstance().getConnection();
+            connection.setAutoCommit(false);
 
             String sql = "INSERT INTO customer (id, first_name, last_name, dob, picture) VALUES (?,?,?,?,?)";
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -234,14 +235,7 @@ public class ManageCustomerFormController {
             stm.setString(3, txtLastName.getText());
             stm.setDate(4, Date.valueOf(txtDob.getValue()));
             stm.setBlob(5, new SerialBlob(picture));
-
-            int affectedRows = stm.executeUpdate();
-
-            if (affectedRows == 0){
-                new Alert(Alert.AlertType.ERROR, "Failed to save the customer, try again", ButtonType.OK).show();
-                btnSaveCustomer.requestFocus();
-                return;
-            }
+            stm.executeUpdate();
 
             PreparedStatement stmContact = connection.
                     prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
@@ -254,11 +248,23 @@ public class ManageCustomerFormController {
                 stmContact.executeBatch();
             }
 
-        } catch (SQLException e) {
+            connection.commit();
+        } catch (Throwable e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to save the customer, contact DEPPO", ButtonType.OK).show();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             btnSaveCustomer.requestFocus();
             return;
+        }finally{
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         tblCustomers.getItems().add(new CustomerTM(
