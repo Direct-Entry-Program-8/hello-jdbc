@@ -205,6 +205,17 @@ public class ManageCustomerFormController {
                 btnSaveCustomer.requestFocus();
                 return;
             }
+
+            PreparedStatement stmContact = connection.prepareStatement("INSERT INTO contact (customer_id, telephone) VALUES (?,?)");
+            for (String telephone : lstTelephone.getItems()) {
+                stmContact.setString(1, txtId.getText());
+                stmContact.setString(2, telephone);
+                stmContact.addBatch();
+            }
+            if (!lstTelephone.getItems().isEmpty()){
+                stmContact.executeBatch();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to save the customer, contact DEPPO", ButtonType.OK).show();
